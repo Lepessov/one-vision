@@ -25,6 +25,11 @@ cp .env.example .env
 ./vendor/bin/sail artisan migrate
 ```
 
+Создаем юзера
+```
+./vendor/bin/sail artisan db:seed
+```
+
 ### Сваггер
 
 ```
@@ -37,3 +42,11 @@ cp .env.example .env
 ```
 
  ### Проект готов!
+
+ по localhost/api/documentation можем делать запросы под
+ 
+```
+ test@example.com
+ password
+```
+ 
