@@ -5,9 +5,9 @@
 1. Клонируйте репозиторий:
 
 ```bash
-git clone https://github.com/Lepessov/blog-api.git
+git clone https://github.com/Lepessov/one-vision.git
 
-cd blog-api
+cd one-vision/blog-api
 ```
 ### Устанавливаем зависимости
 ```
