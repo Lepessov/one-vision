@@ -5,11 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Models\Post;
-use Exception;
-use Illuminate\Support\Facades\Auth;
-use App\Services\DummyPostService;
+use App\Services\PostService;
+use App\Services\PostServiceInterface;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Exception;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -17,6 +18,9 @@ use Symfony\Component\HttpFoundation\Response;
  *      version="1.0.0",
  *      title="Blog API Documentation",
  *      description="API documentation for the Blog API",
+ *      @OA\Contact(
+ *          email="support@example.com"
+ *      )
  * )
  *
  * @OA\SecurityScheme(
@@ -29,11 +33,11 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class PostController extends Controller
 {
-    protected DummyPostService $dummyPostService;
+    protected PostServiceInterface $postService;
 
-    public function __construct(DummyPostService $dummyPostService)
+    public function __construct(PostServiceInterface $postService)
     {
-        $this->dummyPostService = $dummyPostService;
+        $this->postService = $postService;
     }
 
     /**
@@ -55,23 +59,7 @@ class PostController extends Controller
      */
     public function index(): JsonResponse
     {
-        $posts = Post::paginate(10);
-
-        $posts->getCollection()->transform(function ($post) {
-            $dummyData = $this->dummyPostService->getPostById($post->id);
-
-            return [
-                'id' => $post->id,
-                'title' => $dummyData['title'],
-                'description' => substr($dummyData['body'], 0, 128),
-                'tags' => $dummyData['tags'],
-                'reactions' => $dummyData['reactions'],
-                'views' => $dummyData['views'],
-                'userId' => $dummyData['userId'],
-            ];
-        });
-
-        return response()->json($posts);
+        return response()->json($this->postService->getAllPosts());
     }
 
     /**
@@ -102,15 +90,7 @@ class PostController extends Controller
      */
     public function store(StorePostRequest $request): JsonResponse
     {
-        $payload = array_merge($request->all(), ['userId' => Auth::id()]);
-
-        $dummyPost = $this->dummyPostService->createPost($payload);
-
-        $post = Post::create([
-            'user_id' => Auth::id(),
-            'dummy_post_id' => $dummyPost['id'],
-        ]);
-
+        $post = $this->postService->createPost(array_merge($request->validated(), ['userId' => Auth::id()]));
         return response()->json($post, Response::HTTP_CREATED);
     }
 
@@ -156,16 +136,8 @@ class PostController extends Controller
             return response()->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $dummyPost = $this->dummyPostService->updatePost($post->id, $request->validated());
-
-        $post->update([
-            'dummy_post_id' => $dummyPost['id'],
-        ]);
-
-        return response()->json([
-            'title' => $dummyPost['title'],
-            'body' => $dummyPost['body'],
-        ]);
+        $updatedPost = $this->postService->updatePost($post, $request->validated());
+        return response()->json($updatedPost);
     }
 
     /**
@@ -201,11 +173,10 @@ class PostController extends Controller
     public function destroy(Post $post): JsonResponse
     {
         if (Gate::denies('delete-post', $post)) {
-            return response()->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+            return response()->json(['message' => 'You do not own this post!'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $post->delete();
-
+        $this->postService->deletePost($post);
         return response()->json(['message' => 'Post deleted']);
     }
 }

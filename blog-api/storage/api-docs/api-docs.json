@@ -3,6 +3,9 @@
     "info": {
         "title": "Blog API Documentation",
         "description": "API documentation for the Blog API",
+        "contact": {
+            "email": "support@example.com"
+        },
         "version": "1.0.0"
     },
     "paths": {
@@ -312,12 +315,12 @@
                 ],
                 "properties": {
                     "title": {
-                        "type": "string",
-                        "example": "Post Title"
+                        "description": "Title of the post",
+                        "type": "string"
                     },
                     "body": {
-                        "type": "string",
-                        "example": "Post Body"
+                        "description": "Body content of the post",
+                        "type": "string"
                     }
                 },
                 "type": "object"
@@ -329,12 +332,12 @@
                 ],
                 "properties": {
                     "title": {
-                        "type": "string",
-                        "example": "Updated Post Title"
+                        "description": "Title of the post",
+                        "type": "string"
                     },
                     "body": {
-                        "type": "string",
-                        "example": "Updated Post Body"
+                        "description": "Body content of the post",
+                        "type": "string"
                     }
                 },
                 "type": "object"

@@ -11,10 +11,17 @@ use Illuminate\Support\Facades\Validator;
 /**
  * @OA\Schema(
  *     schema="UpdatePostRequest",
- *     type="object",
  *     required={"title", "body"},
- *     @OA\Property(property="title", type="string", example="Updated Post Title"),
- *     @OA\Property(property="body", type="string", example="Updated Post Body")
+ *     @OA\Property(
+ *         property="title",
+ *         type="string",
+ *         description="Title of the post"
+ *     ),
+ *     @OA\Property(
+ *         property="body",
+ *         type="string",
+ *         description="Body content of the post"
+ *     )
  * )
  */
 class UpdatePostRequest extends FormRequest

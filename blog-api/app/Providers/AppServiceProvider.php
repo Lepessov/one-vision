@@ -2,8 +2,14 @@
 
 namespace App\Providers;
 
+use App\Gateways\DummyPostApiGateway;
+use App\Gateways\DummyPostApiGatewayInterface;
 use App\Models\Post;
 use App\Models\User;
+use App\Repositories\PostRepository;
+use App\Repositories\PostRepositoryInterface;
+use App\Services\PostService;
+use App\Services\PostServiceInterface;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -15,7 +21,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(PostRepositoryInterface::class, PostRepository::class);
+        $this->app->bind(DummyPostApiGatewayInterface::class, DummyPostApiGateway::class);
+        $this->app->bind(PostServiceInterface::class, PostService::class);
     }
 
     /**

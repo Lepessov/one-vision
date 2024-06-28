@@ -3,22 +3,29 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @OA\Schema(
  *     schema="StorePostRequest",
- *     type="object",
  *     required={"title", "body"},
- *     @OA\Property(property="title", type="string", example="Post Title"),
- *     @OA\Property(property="body", type="string", example="Post Body")
+ *     @OA\Property(
+ *         property="title",
+ *         type="string",
+ *         description="Title of the post"
+ *     ),
+ *     @OA\Property(
+ *         property="body",
+ *         type="string",
+ *         description="Body content of the post"
+ *     )
  * )
  */
 class StorePostRequest extends FormRequest
 {
-    public function authorize(): true
+    public function authorize(): bool
     {
         return true;
     }
@@ -26,20 +33,12 @@ class StorePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255',
-            'body' => 'required|string',
+            'title' => ['required', 'string', 'max:255'],
+            'body' => ['required', 'string'],
         ];
     }
 
-    public function messages()
-    {
-        return [
-            'title.required' => 'The title field is required.',
-            'body.required' => 'The body field is required.',
-        ];
-    }
-
-    protected function failedValidation(Validator|\Illuminate\Contracts\Validation\Validator $validator)
+    protected function failedValidation(Validator $validator): void
     {
         throw new HttpResponseException(
             response()->json(['errors' => $validator->errors()], Response::HTTP_BAD_REQUEST)
